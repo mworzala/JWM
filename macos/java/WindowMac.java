@@ -229,6 +229,9 @@ public class WindowMac extends Window {
     @ApiStatus.Internal public native void _nSetWindowSize(int width, int height);
     @ApiStatus.Internal public native void _nSetContentSize(int width, int height);
     @ApiStatus.Internal public native void _nSetTitle(String title);
+//    @ApiStatus.Internal public native void _nSetTitleWithRepresentedFilename(String filename);
+    @ApiStatus.Internal public native void _nSetRepresentedFilename(String filename, boolean iconOnly);
+//    @ApiStatus.Internal public native void _nSetRepresentedFileIcon(SomeImage image); //todo
     @ApiStatus.Internal public native void _nSetTitleVisible(boolean value);
     @ApiStatus.Internal public native void _nSetSubtitle(String title);
     @ApiStatus.Internal public native void _nSetIcon(String path);

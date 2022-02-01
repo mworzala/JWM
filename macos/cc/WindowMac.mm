@@ -257,6 +257,22 @@ extern "C" JNIEXPORT void JNICALL Java_io_github_humbleui_jwm_WindowMac__1nSetTi
     [title release];
 }
 
+extern "C" JNIEXPORT void JNICALL Java_io_github_humbleui_jwm_WindowMac__1nSetRepresentedFilename
+  (JNIEnv* env, jobject obj, jstring titleStr, jboolean iconOnly) {
+    jwm::WindowMac* instance = reinterpret_cast<jwm::WindowMac*>(jwm::classes::Native::fromJava(env, obj));
+    jsize len = env->GetStringLength(titleStr);
+    const jchar* chars = env->GetStringCritical(titleStr, nullptr);
+    NSString* title = [[NSString alloc] initWithCharacters:chars length:len];
+    env->ReleaseStringCritical(titleStr, chars);
+    if (iconOnly) {
+        [instance->fNSWindow setRepresentedFilename:title];
+    } else {
+        [instance->fNSWindow setTitleWithRepresentedFilename:title];
+    }
+    [instance->fNSWindow setTitleVisibility:NSWindowTitleVisible];
+    [title release];
+}
+
 extern "C" JNIEXPORT void JNICALL Java_io_github_humbleui_jwm_WindowMac__1nSetTitleVisible
   (JNIEnv* env, jobject obj, jboolean value) {
     jwm::WindowMac* instance = reinterpret_cast<jwm::WindowMac*>(jwm::classes::Native::fromJava(env, obj));
