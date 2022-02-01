@@ -68,6 +68,20 @@ public class WindowMac extends Window {
     }
 
     /**
+     * <p>Sets the represented file for the window.</p>
+     *
+     * @param filename the path to the file to be represented
+     * @param iconOnly whether to affect the window title, or just set the icon to the default file icon
+     * @return this
+     */
+    @NotNull @Contract("-> this")
+    public Window setRepresentedFilename(String filename, boolean iconOnly) {
+        assert _onUIThread();
+        _nSetRepresentedFilename(filename, iconOnly);
+        return this;
+    }
+
+    /**
      * Hide the title from the title bar without changing the text content.
      *
      * @param isVisible visibility flag value
@@ -229,7 +243,6 @@ public class WindowMac extends Window {
     @ApiStatus.Internal public native void _nSetWindowSize(int width, int height);
     @ApiStatus.Internal public native void _nSetContentSize(int width, int height);
     @ApiStatus.Internal public native void _nSetTitle(String title);
-//    @ApiStatus.Internal public native void _nSetTitleWithRepresentedFilename(String filename);
     @ApiStatus.Internal public native void _nSetRepresentedFilename(String filename, boolean iconOnly);
 //    @ApiStatus.Internal public native void _nSetRepresentedFileIcon(SomeImage image); //todo
     @ApiStatus.Internal public native void _nSetTitleVisible(boolean value);

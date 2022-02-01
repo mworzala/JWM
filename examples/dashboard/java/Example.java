@@ -68,7 +68,7 @@ public class Example implements Consumer<Event> {
         window.setTitle("JWM Window #" + count);
         if (window instanceof WindowMac windowMac) {
             windowMac.setSubtitle("Window Subtitle");
-            windowMac._nSetRepresentedFilename("examples/dashboard/java/Example.java", true);
+            windowMac.setRepresentedFilename("examples/dashboard/java/Example.java", true);
         }
 
         switch (Platform.CURRENT) {
