@@ -13,6 +13,7 @@ public class PanelScreens extends Panel {
     public Paint white = new Paint().setColor(0xFFFFFFFF);
     public int idx = 0;
     public Options titleStyles = new Options("Default", "Hidden");
+    public Options progressBars = new Options("None", "0", "50%", "100%", "Indeterminate");
 
     public PanelScreens(Window window) {
         super(window);
@@ -57,6 +58,27 @@ public class PanelScreens extends Panel {
         }
     }
 
+    public void setProgressBar(String progress) {
+        progressBars.set(progress);
+        switch (progress) {
+            case "None" -> {
+                window.setProgressBar(-1);
+            }
+            case "0" -> {
+                window.setProgressBar(0);
+            }
+            case "50%" -> {
+                window.setProgressBar(0.5f);
+            }
+            case "100%" -> {
+                window.setProgressBar(1);
+            }
+            case "Indeterminate" -> {
+                window.setProgressBar(2);
+            }
+        }
+    }
+
     @Override
     public void accept(Event e) {
         float scale = window.getScreen().getScale();
@@ -97,6 +119,9 @@ public class PanelScreens extends Panel {
                     case T -> {
                         setTitleStyle(titleStyles.next());
                         window.focus();
+                    }
+                    case P -> {
+                        setProgressBar(progressBars.next());
                     }
                 }
             }
@@ -156,6 +181,8 @@ public class PanelScreens extends Panel {
         canvas.drawString("Content size: " + contentRect.getWidth() + ", " + contentRect.getHeight(), 0, 0, Example.FONT12, white);
         canvas.translate(0, lineHeight);
         canvas.drawString("Titlebar: " + titleStyles.get(), 0, 0, Example.FONT12, white);
+        canvas.translate(0, lineHeight);
+        canvas.drawString("Progress Bar: " + progressBars.get(), 0, 0, Example.FONT12, white);
         canvas.translate(0, lineHeight);
         canvas.restore();
     }

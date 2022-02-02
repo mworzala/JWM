@@ -533,6 +533,93 @@ extern "C" JNIEXPORT void JNICALL Java_io_github_humbleui_jwm_WindowMac__1nSetZO
     }
     nsWindow.level = level;
 }
+
+// https://github.com/electron/electron/blob/3768a7b25f3db505a25582706de58e7f81121565/shell/browser/native_window_mac.mm#L127
+@interface ElectronProgressBar : NSProgressIndicator
+@end
+
+@implementation ElectronProgressBar
+
+- (void)drawRect:(NSRect)dirtyRect {
+  if (self.style != NSProgressIndicatorBarStyle)
+    return;
+  // Draw edges of rounded rect.
+  NSRect rect = NSInsetRect([self bounds], 1.0, 1.0);
+  CGFloat radius = rect.size.height / 2;
+  NSBezierPath* bezierPath =
+    [NSBezierPath bezierPathWithRoundedRect:rect xRadius:radius yRadius:radius];
+  [bezierPath setLineWidth:2.0];
+  [[NSColor grayColor] set];
+  [bezierPath stroke];
+
+  // Fill the rounded rect.
+  rect = NSInsetRect(rect, 2.0, 2.0);
+  radius = rect.size.height / 2;
+  bezierPath =
+    [NSBezierPath bezierPathWithRoundedRect:rect xRadius:radius yRadius:radius];
+  [bezierPath setLineWidth:1.0];
+  [bezierPath addClip];
+
+  // Calculate the progress width.
+  rect.size.width =
+      floor(rect.size.width * ([self doubleValue] / [self maxValue]));
+
+  // Fill the progress bar with color blue.
+  [[NSColor colorWithSRGBRed:0.2 green:0.6 blue:1 alpha:1] set];
+  NSRectFill(rect);
+}
+
+@end
+
+extern "C" JNIEXPORT void JNICALL Java_io_github_humbleui_jwm_WindowMac__1nSetProgressBar
+  (JNIEnv* env, jobject obj, jfloat value) {
+
+    // https://github.com/electron/electron/blob/3768a7b25f3db505a25582706de58e7f81121565/shell/browser/native_window_mac.mm#L1268
+    NSDockTile* dockTile = [NSApp dockTile];
+
+    // Sometimes macOS would install a default contentView for dock, we must
+    // verify whether NSProgressIndicator has been installed.
+    bool firstTime = !dockTile.contentView ||
+                      [[dockTile.contentView subviews] count] == 0 ||
+                      ![[[dockTile.contentView subviews] lastObject]
+                          isKindOfClass:[NSProgressIndicator class]];
+
+    // For the first time API invoked, we need to create a ContentView in
+    // DockTile.
+    NSLog(@"firstTime: %d", firstTime);
+    if (firstTime) {
+      NSImageView* imageView = [[[NSImageView alloc] init] autorelease];
+      [imageView setImage:[NSApp applicationIconImage]];
+      [dockTile setContentView:imageView];
+
+      NSRect frame = NSMakeRect(0.0f, 0.0f, dockTile.size.width, 15.0);
+      NSProgressIndicator* progressIndicator =
+          [[[ElectronProgressBar alloc] initWithFrame:frame] autorelease];
+      [progressIndicator setStyle:NSProgressIndicatorStyleBar];
+      [progressIndicator setIndeterminate:NO];
+      [progressIndicator setBezeled:YES];
+      [progressIndicator setMinValue:0];
+      [progressIndicator setMaxValue:1];
+      [progressIndicator setHidden:NO];
+      [dockTile.contentView addSubview:progressIndicator];
+    }
+
+    NSProgressIndicator* progressIndicator =
+        static_cast<NSProgressIndicator*>([[[dockTile contentView] subviews] lastObject]);
+    if (value < 0) {
+      [progressIndicator setHidden:YES];
+    } else if (value > 1) {
+      [progressIndicator setHidden:NO];
+      [progressIndicator setIndeterminate:YES];
+      [progressIndicator setDoubleValue:1];
+    } else {
+      [progressIndicator setHidden:NO];
+      [progressIndicator setDoubleValue:value];
+    }
+    [dockTile display];
+
+}
+
 extern "C" JNIEXPORT void JNICALL Java_io_github_humbleui_jwm_WindowMac__1nClose
   (JNIEnv* env, jobject obj) {
     jwm::WindowMac* instance = reinterpret_cast<jwm::WindowMac*>(jwm::classes::Native::fromJava(env, obj));

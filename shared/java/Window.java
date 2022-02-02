@@ -334,6 +334,16 @@ public abstract class Window extends RefCounted implements Consumer<Event> {
     public abstract Window setZOrder(ZOrder order);
 
     /**
+     * <p>Sets the progress bar for the window*.</p>
+     * <p>*On windows, each application can have it's own progress. On macos and linux (unity) this will set the progress for the app as a whole</p>
+     * <p>Note: Only implemented on macos</p>
+     *
+     * @param progress
+     * @return
+     */
+    public abstract Window setProgressBar(float progress);
+
+    /**
      * <p>Feed an event to Window’s listener. Same as getEventListener().accept(Event)</p>
      */
     public void accept(Event e) {
